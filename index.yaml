@@ -3,9 +3,9 @@ entries:
   wukongim:
   - apiVersion: v2
     appVersion: v2.0.1-beta-20240715
-    created: "2024-09-30T15:35:03.347956+08:00"
+    created: "2024-09-30T15:45:16.443488+08:00"
     description: WukongIM 集群服务的 Helm Chart
-    digest: 2d528d5235fec1015b8be3e7384ede0a2c2e9f83ca5e5c36102a8567f35fe94f
+    digest: 3cbacd6b9fcb20d79b14293654aaa258b1fe3ae5fb5930e28b4145654da56f99
     home: githubim.com）
     keywords:
     - 悟空IM（让信息传递更简单）
@@ -24,4 +24,4 @@ entries:
     urls:
     - https://wukongim.github.io/helm/wukongim-0.2.0.tgz
     version: 0.2.0
-generated: "2024-09-30T15:35:03.346511+08:00"
+generated: "2024-09-30T15:45:16.440586+08:00"
