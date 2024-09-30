@@ -5,7 +5,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     k8s.kuboard.cn/name: helm-wukongim
   name: helm-wukongim
-  namespace: mloss
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:

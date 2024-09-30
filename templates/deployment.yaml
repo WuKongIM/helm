@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: helm-wukongim
-  namespace: {{ .Values.namespace }}
 spec:
   serviceName: {{ .Values.serviceName }}
   replicas: {{ int .Values.replicaCount }}
@@ -18,6 +17,10 @@ spec:
         - name: wukoingim
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             # 动态获取节点IP，设置WK_CLUSTER_SERVERADDR
             - name: WK_CLUSTER_SERVERADDR_IP
               valueFrom:
@@ -40,6 +43,7 @@ spec:
               - /bin/sh
               - -c
               - |
+                echo "当前命名空间 is: ${POD_NAMESPACE}"
                 # 提取 POD_NAME 中的最后一部分（数字）
                 echo "当前节点名称 is: ${POD_NAME}+1"
                 NODE_ID=$(echo "${POD_NAME##*-}")
@@ -51,9 +55,9 @@ spec:
                 echo "WK_CLUSTER_APIURL is: ${WK_CLUSTER_APIURL}"
                 echo "WK_EXTERNAL_TCPADDR is: ${WK_EXTERNAL_TCPADDR}"
                 echo "WK_EXTERNAL_WSADDR is: ${WK_EXTERNAL_WSADDR}"
-                
+
                 if [ "$NEW_NODE_ID" -gt 1 ]; then
-                    export "WK_CLUSTER_SEED=1@helm-wukongim-0.helm-wukongim-headless.mloss.svc.cluster.local:11110"
+                    export "WK_CLUSTER_SEED=1@helm-wukongim-0.helm-wukongim-headless.${POD_NAMESPACE}.svc.cluster.local:11110"
                     echo "当前种子节点 is: WK_CLUSTER_SEED is: ${WK_CLUSTER_SEED}"
                 else
                     echo "WK_CLUSTER_SEED 该节点为根节点 无需设置种子节点"

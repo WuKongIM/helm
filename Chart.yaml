@@ -1,6 +1,6 @@
 apiVersion: v2
 name: wukongim
-version: 0.1.0
+version: 0.2.0
 
 # kubeVersion: ">=1.8.0"
 description: WukongIM 集群服务的 Helm Chart
