@@ -19,4 +19,4 @@ maintainers:
   - name: vera-byte
     email: forget@mlvw.team
     url: https://github.com/vera-byte
-appVersion: "v2.0.1-beta-20240715"
+appVersion: { { .Values.image.tag } }
