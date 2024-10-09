@@ -1,7 +1,7 @@
 # WukongIM镜像
 image:
   repository: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim
-  tag: v2.0.2-beta-20240805
+  tag: v2.0.5-20240925
 
 # 副本数量
 replicaCount: 2
