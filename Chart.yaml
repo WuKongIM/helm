@@ -1,6 +1,6 @@
 apiVersion: v2
 name: wukongim
-version: 1.0.0
+version: 2.0.0
 
 # kubeVersion: ">=1.8.0"
 description: WukongIM 集群服务的 Helm Chart
@@ -19,4 +19,4 @@ maintainers:
   - name: vera-byte
     email: forget@mlvw.team
     url: https://github.com/vera-byte
-appVersion: { { .Values.image.tag } }
+appVersion: v2.0.2-beta-20240805

@@ -16,6 +16,34 @@ spec:
       containers:
         - name: wukoingim
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          livenessProbe:
+            exec:
+              command:
+              - "wget"
+              - "-q"
+              - "-Y"
+              - "off"
+              - "-O"
+              - "/dev/null"
+              - "http://localhost:5001/health"
+            initialDelaySeconds: 10  # 容器启动后等待 10 秒开始进行首次检查
+            periodSeconds: 10        # 每 10 秒检查一次
+            timeoutSeconds: 10       # 检查超时时间为 10 秒
+            failureThreshold: 3      # 连续 3 次检查失败则认为容器不健康
+          readinessProbe:
+            exec:
+              command:
+              - "wget"
+              - "-q"
+              - "-Y"
+              - "off"
+              - "-O"
+              - "/dev/null"
+              - "http://localhost:5001/health"
+            initialDelaySeconds: 5   # 容器启动后等待 5 秒开始进行首次检查
+            periodSeconds: 10        # 每 10 秒检查一次
+            timeoutSeconds: 10       # 检查超时时间为 10 秒
+            failureThreshold: 3      # 连续 3 次检查失败则认为容器不准备好接收流量
           env:
             - name: POD_NAMESPACE
               valueFrom:
