@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: helm-wukongim
+  name: wukongim
 spec:
-  serviceName: {{ .Values.serviceName }}
+  serviceName: wkim-headless
   replicas: {{ int .Values.replicaCount }}
   selector:
     matchLabels:
@@ -62,17 +62,20 @@ spec:
               value: "ws://{{ .Values.externalIP }}:5100"
             - name: WK_EXTERNAL_WSADDR
               value: "ws://{{ .Values.externalIP }}:5200"
-            - name: SERVICE_NAME
-              value: {{ .Values.serviceName }}
             # StatefulSet 的 Pod 名字会自动带有唯一的索引，使用该索引作为节点ID
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: HEADLESS_SERVICE_NAME
+              value: {{ .Values.headlessServiceName }}
+            - name: WK_MODE
+              value: {{ .Values.runMode}}
           command:
               - /bin/sh
               - -c
               - |
+                echo "当前运行模式 is: ${WK_MODE}"
                 echo "当前命名空间 is: ${POD_NAMESPACE}"
                 # 提取 POD_NAME 中的最后一部分（数字）
                 echo "当前节点名称 is: ${POD_NAME}+1"
@@ -85,9 +88,12 @@ spec:
                 echo "WK_CLUSTER_APIURL is: ${WK_CLUSTER_APIURL}"
                 echo "WK_EXTERNAL_TCPADDR is: ${WK_EXTERNAL_TCPADDR}"
                 echo "WK_EXTERNAL_WSADDR is: ${WK_EXTERNAL_WSADDR}"
-                echo "SERVICE_NAME is: ${SERVICE_NAME}"
+                echo "HEADLESS_SERVICE_NAME is: ${HEADLESS_SERVICE_NAME}"
+                export  HEADLESS_POD_DNS_NAME="${POD_DNS_NAME}.${HEADLESS_SERVICE_NAME}:11110"
+                echo "服务的DNS地址: ${POD_DNS_NAME}"
                 if [ "$NEW_NODE_ID" -gt 1 ]; then
-                    export "WK_CLUSTER_SEED=1@helm-wukongim-0.${SERVICE_NAME}.${POD_NAMESPACE}.svc.cluster.local:11110"
+                    # 服务发现链接规则: <pod-name>.<headless-service-name>
+                    export "WK_CLUSTER_SEED=1@wukongim-0.wkim-headless:11110"
                     echo "当前种子节点 is: WK_CLUSTER_SEED is: ${WK_CLUSTER_SEED}"
                 else
                     echo "WK_CLUSTER_SEED 该节点为根节点 无需设置种子节点"

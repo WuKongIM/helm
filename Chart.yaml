@@ -1,6 +1,6 @@
 apiVersion: v2
 name: wukongim
-version: 2.0.0
+version: 2.0.4
 
 # kubeVersion: ">=1.8.0"
 description: WukongIM 集群服务的 Helm Chart
@@ -11,7 +11,7 @@ keywords:
   - 集群（高可用）
   - Helm Chart（Kubernetes）
   - WukongIM
-home: https://github.com/WuKongIM/helm
+home: githubim.com）
 sources:
   - https://github.com/WuKongIM/WuKongIM
 

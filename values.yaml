@@ -9,11 +9,11 @@ replicaCount: 2
 # 外部IP
 externalIP: 115.29.205.135
 
-# 服务名称
-serviceName: helm-wukongim-headless
 # 管理后台域名
 adminDomain: admin.test.com
 # 管理后台端口
 demoDomain: demo.test.com
 # websocketDomain
 websocketDomain: ws.test.com
+# 运行模式
+runMode: debug
