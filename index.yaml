@@ -3,7 +3,7 @@ entries:
   wukongim:
   - apiVersion: v2
     appVersion: v2.0.5-20240925
-    created: "2024-10-09T17:00:02.815353+08:00"
+    created: "2024-10-10T10:30:19.128137+08:00"
     description: WukongIM 集群服务的 Helm Chart
     digest: a61f2e64a188884bb23d0f2f6f8fede4608aec567e6bf368e62cbc3a3aae401f
     home: githubim.com）
@@ -22,6 +22,6 @@ entries:
     - https://github.com/WuKongIM/WuKongIM
     type: application
     urls:
-    - https://vera-byte.github.io/WuKongIM/helm/wukongim-2.0.0.tgz
+    - https://wukongim.github.io/helm/wukongim-2.0.0.tgz
     version: 2.0.0
-generated: "2024-10-09T17:00:02.808814+08:00"
+generated: "2024-10-10T10:30:19.121381+08:00"
