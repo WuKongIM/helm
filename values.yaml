@@ -17,3 +17,7 @@ adminDomain: admin.test.com
 demoDomain: demo.test.com
 # websocketDomain
 websocketDomain: ws.test.com
+
+storage:
+  class: "ssd" # 存储类名
+  size: "20Gi" # 单个节点存储大小

@@ -1,0 +1,43 @@
+name: Release Helm Chart
+
+on:
+  push:
+    tags:
+      - "v*" # 当推送 v 开头的 tag 时触发
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取所有历史记录
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.14.0 # 指定 Helm 版本
+
+      - name: Package Chart
+        run: |
+          helm package charts/my-app -d packaged-charts/
+          ls -l packaged-charts/
+
+      - name: Generate Index
+        run: |
+          # 获取历史 index.yaml 用于合并
+          git fetch origin gh-pages
+          mkdir -p gh-pages
+          git show origin/gh-pages:index.yaml > gh-pages/index.yaml 2>/dev/null || touch gh-pages/index.yaml
+
+          # 生成新索引
+          helm repo index packaged-charts/ --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }} --merge gh-pages/index.yaml
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: packaged-charts/
+          destination_dir: . # 发布到根目录
+          keep_files: true # 保留历史文件

@@ -1,3 +1,5 @@
+
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -8,20 +10,31 @@ spec:
   selector:
     matchLabels:
       app: wukongim
+  
+  # 添加存储卷声明模板（关键修改点）
+  volumeClaimTemplates:
+  - metadata:
+      name: data  # 卷名称，将在容器中挂载
+    spec:
+      accessModes: [ "ReadWriteOnce" ]  # 单节点读写模式，确保存储隔离
+      storageClassName: {{ .Values.storage.class | default "standard" }}  # 存储类名，通过values.yaml配置
+      resources:
+        requests:
+          storage: {{ .Values.storage.size | default "10Gi" }}  # 每个Pod请求的存储大小
+
   template:
     metadata:
       labels:
         app: wukongim
     spec:
       containers:
-        - name: wukoingim
+        - name: wukongim
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           env:
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            # 动态获取节点IP，设置WK_CLUSTER_SERVERADDR
             - name: WK_CLUSTER_SERVERADDR_IP
               valueFrom:
                 fieldRef:
@@ -34,33 +47,51 @@ spec:
               value: "ws://{{ .Values.externalIP }}:5100"
             - name: WK_EXTERNAL_WSADDR
               value: "ws://{{ .Values.externalIP }}:5200"
-            # StatefulSet 的 Pod 名字会自动带有唯一的索引，使用该索引作为节点ID
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
           command:
-              - /bin/sh
-              - -c
-              - |
-                echo "当前命名空间 is: ${POD_NAMESPACE}"
-                # 提取 POD_NAME 中的最后一部分（数字）
-                echo "当前节点名称 is: ${POD_NAME}+1"
-                NODE_ID=$(echo "${POD_NAME##*-}")
-                NEW_NODE_ID=$((NODE_ID + 1))
-                export WK_CLUSTER_NODEID="${NEW_NODE_ID}"
-                echo "Node ID is: ${WK_CLUSTER_NODEID}"
-                echo "WK_CLUSTER_SERVERADDR is: ${WK_CLUSTER_SERVERADDR}"
-                export WK_CLUSTER_APIURL="http://${WK_CLUSTER_SERVERADDR_IP}:5001"
-                echo "WK_CLUSTER_APIURL is: ${WK_CLUSTER_APIURL}"
-                echo "WK_EXTERNAL_TCPADDR is: ${WK_EXTERNAL_TCPADDR}"
-                echo "WK_EXTERNAL_WSADDR is: ${WK_EXTERNAL_WSADDR}"
+            - /bin/sh
+            - -c
+            - |
+              echo "当前命名空间: ${POD_NAMESPACE}"
+              echo "当前节点名称: ${POD_NAME}+1"
+              NODE_ID=$(echo "${POD_NAME##*-}")
+              NEW_NODE_ID=$((NODE_ID + 1))
+              export WK_CLUSTER_NODEID="${NEW_NODE_ID}"
+              echo "Node ID: ${WK_CLUSTER_NODEID}"
+              export WK_CLUSTER_APIURL="http://${WK_CLUSTER_SERVERADDR_IP}:5001"
+              echo "WK_CLUSTER_APIURL: ${WK_CLUSTER_APIURL}"
+              echo "WK_EXTERNAL_TCPADDR: ${WK_EXTERNAL_TCPADDR}"
+              echo "WK_EXTERNAL_WSADDR: ${WK_EXTERNAL_WSADDR}"
 
-                if [ "$NEW_NODE_ID" -gt 1 ]; then
-                    export "WK_CLUSTER_SEED=1@helm-wukongim-0.helm-wukongim-headless.${POD_NAMESPACE}.svc.cluster.local:11110"
-                    echo "当前种子节点 is: WK_CLUSTER_SEED is: ${WK_CLUSTER_SEED}"
-                else
-                    echo "WK_CLUSTER_SEED 该节点为根节点 无需设置种子节点"
-                fi
-                # 启动
-                exec /home/app --config=/root/wukongim/wk.yaml --ignoreMissingConfig=true
+              if [ "$NEW_NODE_ID" -gt 1 ]; then
+                  export WK_CLUSTER_SEED="1@helm-wukongim-0.helm-wukongim-headless.${POD_NAMESPACE}.svc.cluster.local:11110"
+                  echo "当前种子节点: ${WK_CLUSTER_SEED}"
+              else
+                  echo "该节点为根节点，无需设置种子节点"
+              fi
+
+              exec /home/app --config=/root/wukongim/wk.yaml --ignoreMissingConfig=true
+          
+          # 添加存储卷挂载（关键修改点）
+          volumeMounts:
+          - name: data  # 对应volumeClaimTemplates中的名称
+            mountPath: /home/wukongimdata  # 容器内挂载路径（根据实际需求修改）
+            # subPath: "{{`{{ .Release.Name }}`}}/{{`{{ .Chart.Name }}`}}/$(POD_NAME)"  # 二级隔离路径（可选）
+
+          # 建议添加资源限制（非必须但推荐）
+          resources:
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+
+    # 添加存储卷声明
+    volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: data-helm-wukongim-$(POD_NAME)  # 自动生成唯一PVC名称
