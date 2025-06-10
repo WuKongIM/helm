@@ -21,7 +21,7 @@ jobs:
 
       - name: Package Chart
         run: |
-          helm package charts/my-app -d packaged-charts/
+          helm package charts/vera-byte-wkim -d packaged-charts/
           ls -l packaged-charts/
 
       - name: Generate Index
