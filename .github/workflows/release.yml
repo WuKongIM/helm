@@ -4,7 +4,8 @@ on:
   push:
     tags:
       - "v*" # 当推送 v 开头的 tag 时触发
-permissions: read-all
+permissions:
+  contents: write # ✅ 关键：允许读写代码库内容
 jobs:
   release:
     runs-on: ubuntu-latest
