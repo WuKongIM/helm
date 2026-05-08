@@ -27,19 +27,27 @@ helm search repo wukongim
 
 #### 4. 部署
 ```bash
-# 可选参数 
-# 1.副本数量 replicaCount=1 默认为2
-# 2.外部IP externalIP=
 helm install wkim wukongim/wukongim -n wukongim --create-namespace --version 0.1.0 --set replicaCount=3
 ```
 
-#### 5. 查看安装状态
+#### 5. service LB 部署示例
+
+如果需要使用云厂商的负载均衡，可以通过 `--set` 设置注解或使用 `values.yaml`。
+
+**通过命令行设置 (以阿里云为例)**
+```bash
+helm install wkim wukongim/wukongim -n wukongim \
+  --set service.type=LoadBalancer \
+  --set service.annotations."service\.beta\.kubernetes\.io/alicloud-loadbalancer-address-type"=internet \
+  --set service.annotations."service\.beta\.kubernetes\.io/alibaba-cloud-loadbalancer-spec"=slb.s1.small
+```
+
+#### 6. 查看安装状态
 ```bash
 helm status wkim
 ```
 
-
-#### 6. 卸载
+#### 7. 卸载
 ```bash
 helm uninstall wkim
 ```
