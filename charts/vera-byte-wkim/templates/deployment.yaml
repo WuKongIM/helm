@@ -90,8 +90,8 @@ spec:
               cpu: "500m"
               memory: "512Mi"
 
-    # 添加存储卷声明
-    volumes:
-    - name: data
-      persistentVolumeClaim:
-        claimName: data-helm-wukongim-$(POD_NAME)  # 自动生成唯一PVC名称
+      # 添加存储卷声明
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data-helm-wukongim-$(POD_NAME)  # 自动生成唯一PVC名称
