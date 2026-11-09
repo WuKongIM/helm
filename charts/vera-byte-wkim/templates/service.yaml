@@ -1,6 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     app.kubernetes.io/managed-by: Helm
     k8s.kuboard.cn/name: helm-wukongim
@@ -39,6 +43,6 @@ spec:
   selector:
     app: wukongim
   sessionAffinity: None
-  type: NodePort
+  type: {{ .Values.service.type | default "NodePort" }}
 status:
   loadBalancer: {}

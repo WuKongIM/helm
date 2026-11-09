@@ -18,6 +18,25 @@ demoDomain: demo.test.com
 # websocketDomain
 websocketDomain: ws.test.com
 
+# 服务配置
+service:
+  type: NodePort # 可选: ClusterIP, NodePort, LoadBalancer
+  # 负载均衡注解，支持 阿里云、GCP、腾讯云、AWS 等
+  annotations: {}
+    # 阿里云 (Aliyun) 示例:
+    # service.beta.kubernetes.io/alicloud-loadbalancer-address-type: "internet"
+    # service.beta.kubernetes.io/alibaba-cloud-loadbalancer-spec: "slb.s1.small"
+    
+    # AWS 示例 (NLB):
+    # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    # service.beta.kubernetes.io/aws-load-balancer-internal: "false"
+
+    # GCP 示例:
+    # cloud.google.com/load-balancer-type: "External"
+
+    # 腾讯云 (Tencent) 示例:
+    # service.kubernetes.io/tencent-cloud-loadbalancer-type: "public"
+
 storage:
   class: "ssd" # 存储类名
   size: "20Gi" # 单个节点存储大小
